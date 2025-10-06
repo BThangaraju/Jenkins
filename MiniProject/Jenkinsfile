@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+    triggers { 
+        githubPush() 
+    }
+
+    environment {
+        DOCKER_IMAGE_NAME = 'calculator'           // image name
+        DOCKERHUB_REPO    = 'iiitb'                // your DockerHub namespace
+        DOCKERHUB_CRED    = 'DockerHubCred'       // Jenkins credential id for DockerHub
+        GIT_REPO_URL      = 'https://github.com/BThangaraju/Jenkins.git'
+        GIT_BRANCH        = 'master'               // change to 'main' if needed
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Explicit checkout using the repo URL and branch
+                git branch: "${GIT_BRANCH}", url: "${GIT_REPO_URL}"
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('MiniProject') {
+                    script {
+                        docker.build("${DOCKER_IMAGE_NAME}")
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('', "${DOCKERHUB_CRED}") {
+                        sh "docker tag ${DOCKER_IMAGE_NAME} ${DOCKERHUB_REPO}/${DOCKER_IMAGE_NAME}:latest"
+                        sh "docker push ${DOCKERHUB_REPO}/${DOCKER_IMAGE_NAME}:latest"
+                    }
+                }
+            }
+        }
+
+        stage('Run Ansible Playbook') {
+            steps {
+                dir('MiniProject') {
+                    script {
+                        ansiblePlaybook(
+                            playbook: 'deploy.yml',
+                            inventory: 'inventory'
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
