@@ -1,6 +1,7 @@
 ---
 - name: Pull Docker Image from Docker Hub
-  hosts: localhost
+  hosts: local
+  # hosts: localhost
   remote_user: raju
   become: false
   tasks:
