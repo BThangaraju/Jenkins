@@ -1,5 +1,1 @@
-localhost ansible_connection=ssh ansible_user=raju ansible_password='raju@123' ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-#	ansible_connection=ssh — use SSH to connect (instead of local, docker, etc.).
-#	ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' — extra SSH flags passed to the SSH client:
-#	-o StrictHostKeyChecking=no → do not prompt to accept unknown host keys (auto-accept).
-#	-o UserKnownHostsFile=/dev/null → do not record host keys in ~/.ssh/known_hosts (and effectively ignore known_hosts).
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_ssh_user=raju ansible_ssh_pass=raju@123
